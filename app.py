@@ -311,6 +311,11 @@ def anmelden_slot_auswahl(tn_id):
         flash("Teilnehmer nicht gefunden.", "danger")
         return redirect(url_for("index"))
 
+    if tn["verletzt"]:
+        conn.close()
+        flash("🩹 Du bist als verletzt/krank markiert und kannst dich nicht anmelden. Bitte melde dich bei der Lagerleitung.", "warning")
+        return render_template("anmelden_slot_auswahl.html", tn=tn, slots=[], already=set(), slot_sportarten={})
+
     # NUR aktive Slots anzeigen
     slots = conn.execute("SELECT * FROM slots WHERE aktiv = 1 ORDER BY reihenfolge").fetchall()
 
@@ -349,6 +354,11 @@ def anmelden_fuer_slot(tn_id, slot_id):
         conn.close()
         flash("Teilnehmer oder Slot nicht gefunden (vielleicht noch nicht freigeschaltet).", "danger")
         return redirect(url_for("index"))
+
+    if tn["verletzt"]:
+        conn.close()
+        flash("🩹 Du bist als verletzt/krank markiert und kannst dich nicht anmelden. Bitte melde dich bei der Lagerleitung.", "danger")
+        return redirect(url_for("anmelden_slot_auswahl", tn_id=tn_id))
 
     existing = conn.execute(
         "SELECT id, wahl1_id, wahl2_id, wahl3_id FROM anmeldungen WHERE teilnehmer_id = ? AND slot_id = ?",
@@ -761,7 +771,7 @@ def admin_auto_assign(slot_id):
         JOIN teilnehmer t ON t.id = a.teilnehmer_id
         LEFT JOIN slot_zelt_priorities szp 
             ON szp.slot_id = a.slot_id AND LOWER(szp.zelt_name) = LOWER(t.zelt)
-        WHERE a.slot_id = ?
+        WHERE a.slot_id = ? AND t.verletzt = 0
         ORDER BY zelt_priority ASC, a.erstellt_um ASC
     """, (slot_id,)).fetchall()
 

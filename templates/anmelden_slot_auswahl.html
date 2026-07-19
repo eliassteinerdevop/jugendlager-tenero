@@ -10,6 +10,9 @@
         Nur <strong>freigeschaltete</strong> Slots werden angezeigt.
     </p>
 
+    {% if not slots %}
+    <p class="text-muted">🔒 Aktuell sind keine Slots verfügbar.</p>
+    {% else %}
     <div style="margin-bottom: 16px;">
         {% for slot in slots %}
             {% set sports = slot_sportarten[slot.id] %}
@@ -49,6 +52,7 @@
             </div>
         {% endfor %}
     </div>
+    {% endif %}
 
     <a href="/anmelden" class="btn btn-outline">🔙 Anderer Teilnehmer</a>
     <a href="/" class="btn btn-outline">🔙 Zur Startseite</a>
