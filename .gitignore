@@ -1,0 +1,8 @@
+daten/
+__pycache__/
+*.pyc
+.env
+venv/
+backups/
+screenshot_*.png
+.DS_Store

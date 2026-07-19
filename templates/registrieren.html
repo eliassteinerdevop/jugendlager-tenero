@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block titel %}Anmeldung – {{ sport.name }}{% endblock %}
+{% block content %}
+<div class="card">
+    <h2>✋ Anmeldung für {{ sport.name }}</h2>
+    <p style="color:#666; margin-bottom: 20px;">
+        {{ sport.beschreibung }}
+    </p>
+
+    <form method="POST">
+        <label for="vorname">Vorname *</label>
+        <input type="text" id="vorname" name="vorname" required placeholder="Dein Vorname">
+
+        <label for="nachname">Nachname *</label>
+        <input type="text" id="nachname" name="nachname" required placeholder="Dein Nachname">
+
+        <label for="alter">Alter *</label>
+        <input type="number" id="alter" name="alter" required min="4" max="18" placeholder="z.B. 12">
+
+        <label for="email">E-Mail (optional)</label>
+        <input type="email" id="email" name="email" placeholder="deine@email.ch">
+
+        <label for="notizen">Notizen / Bemerkungen</label>
+        <textarea id="notizen" name="notizen" rows="3" placeholder="Allergien, Wünsche, …"></textarea>
+
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+            <button type="submit" class="btn btn-success">✅ Anmelden</button>
+            <a href="/" class="btn" style="background:#eee;color:#555;">🔙 Zurück</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

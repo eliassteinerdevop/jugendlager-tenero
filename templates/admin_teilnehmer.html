@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block titel %}Teilnehmer – Admin{% endblock %}
+{% block content %}
+
+<div class="card">
+    <h3>👥 Teilnehmer ({{ teilnehmer|length }})</h3>
+    <div style="margin-bottom:10px; display:flex; gap:6px; flex-wrap:wrap;">
+        <button onclick="filterTn('all')" class="btn btn-sm" style="background:var(--primary);color:white;" id="filter-all">📋 Alle</button>
+        <button onclick="filterTn('unreg')" class="btn btn-sm" id="filter-unreg">👻 Nicht angemeldet</button>
+        <button onclick="filterTn('reg')" class="btn btn-sm" id="filter-reg">✅ Angemeldet</button>
+        <span style="flex:1;"></span>
+        <input type="text" id="tn-search" placeholder="🔍 Suchen..."
+               oninput="searchTn(this.value)"
+               style="padding:4px 10px;border:1px solid var(--gray-300);border-radius:var(--radius);font-size:0.85rem;">
+    </div>
+    {% if teilnehmer %}
+    <div style="overflow-x:auto;">
+        <table id="tn-table">
+            <tr>
+                <th onclick="sortTn(0)" style="cursor:pointer;">Zelt ↕</th>
+                <th onclick="sortTn(1)" style="cursor:pointer;">Name ↕</th>
+                <th>Geburtsdatum</th>
+                <th onclick="sortTn(3)" style="cursor:pointer;">Hauptsportart ↕</th>
+                <th>Kommentar</th>
+                <th>Schwimmen</th>
+                <th>Medikamente</th>
+                <th>Status</th>
+                <th onclick="sortTn(8)" style="cursor:pointer;">Anmeldungen ↕</th>
+                <th>Aktion</th>
+            </tr>
+            {% for tn in teilnehmer %}
+            {% set anm_count = anmeldungen|selectattr('teilnehmer_id', 'equalto', tn.id)|list|length %}
+            <tr style="{% if tn.verletzt %}opacity:0.6;{% endif %}" class="tn-row" data-anm="{{ anm_count }}">
+                <td><span class="badge badge-info">{{ tn.zelt }}</span></td>
+                <td><strong>{{ tn.nachname }}</strong> {{ tn.vorname }}</td>
+                <td style="font-size:0.8rem;">{% if tn.geburtsdatum %}{{ tn.geburtsdatum }}{% else %}<span class="text-muted">–</span>{% endif %}</td>
+                <td style="max-width:200px;font-size:0.8rem;">{% if tn.hauptsportart %}{{ tn.hauptsportart.split('(')[0].strip() }}{% else %}<span class="text-muted">–</span>{% endif %}</td>
+                <td style="max-width:200px;font-size:0.8rem;">{% if tn.kommentar %}{{ tn.kommentar }}{% else %}<span class="text-muted">–</span>{% endif %}</td>
+                <td>{% if tn.schwimmen %}<span class="badge badge-{% if tn.schwimmen == 'Ja' %}success{% elif tn.schwimmen == 'Nein' %}danger{% else %}warning{% endif %}">{{ tn.schwimmen }}</span>{% else %}<span class="text-muted">–</span>{% endif %}</td>
+                <td style="font-size:0.8rem;">{% if tn.medikamente %}{{ tn.medikamente }}{% else %}<span class="text-muted">–</span>{% endif %}</td>
+                <td>
+                    {% if tn.verletzt %}
+                        <span class="badge badge-danger">🩹 Verletzt</span>
+                    {% else %}
+                        <span class="badge badge-success">✅ OK</span>
+                    {% endif %}
+                </td>
+                <td>{{ anm_count }}/{{ slots|length }} Slots</td>
+                <td style="white-space:nowrap;">
+                    <form class="inline-form" method="POST" action="{{ url_for('teilnehmer_verletzt_toggle', tn_id=tn.id) }}">
+                        <input type="hidden" name="code" value="{{ code }}">
+                        <button type="submit" class="btn btn-sm {% if tn.verletzt %}btn-success{% else %}btn-warning{% endif %}"
+                                style="padding:2px 8px;font-size:0.7rem;">
+                            {% if tn.verletzt %}✅ Gesund{% else %}🩹 Verletzt{% endif %}
+                        </button>
+                    </form>
+                    <form class="inline-form" method="POST" action="{{ url_for('teilnehmer_loeschen', tn_id=tn.id) }}"
+                          onsubmit="return confirm('{{ tn.vorname }} {{ tn.nachname }} wirklich löschen?')">
+                        <input type="hidden" name="code" value="{{ code }}">
+                        <button type="submit" class="btn btn-danger btn-sm" style="padding:2px 8px;font-size:0.7rem;">🗑️</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    {% else %}
+    <p class="text-muted">Noch keine Teilnehmer.</p>
+    {% endif %}
+</div>
+
+<a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline">🔙 Zurück zum Admin</a>
+
+<script>
+var sortDir = [];
+function filterTn(mode) {
+    document.querySelectorAll('#tn-table .tn-row').forEach(function(r) {
+        var anm = parseInt(r.getAttribute('data-anm'));
+        if (mode === 'all') r.style.display = '';
+        else if (mode === 'unreg') r.style.display = anm === 0 ? '' : 'none';
+        else if (mode === 'reg') r.style.display = anm > 0 ? '' : 'none';
+    });
+    document.querySelectorAll('[id^=filter-]').forEach(function(b) {
+        b.style.background = ''; b.style.color = '';
+    });
+    var btn = document.getElementById('filter-' + mode);
+    if (btn) { btn.style.background = 'var(--primary)'; btn.style.color = 'white'; }
+}
+function searchTn(val) {
+    var q = val.toLowerCase();
+    document.querySelectorAll('#tn-table .tn-row').forEach(function(r) {
+        var txt = r.textContent.toLowerCase();
+        r.style.display = txt.includes(q) ? '' : 'none';
+    });
+}
+function sortTn(col) {
+    var tbody = document.querySelector('#tn-table');
+    var rows = Array.from(tbody.querySelectorAll('.tn-row'));
+    sortDir[col] = (sortDir[col] || 1) * -1;
+    var dir = sortDir[col];
+    rows.sort(function(a, b) {
+        var va = a.cells[col].textContent.trim().toLowerCase();
+        var vb = b.cells[col].textContent.trim().toLowerCase();
+        if (va < vb) return -1 * dir;
+        if (va > vb) return 1 * dir;
+        return 0;
+    });
+    rows.forEach(function(r) { tbody.appendChild(r); });
+}
+</script>
+
+{% endblock %}

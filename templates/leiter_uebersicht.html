@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% block titel %}Leiter-Ansicht{% endblock %}
+{% block content %}
+
+{% if sport_info and slot_info %}
+  {# ─── DETAIL-ANSICHT: Eine bestimmte Sportart ─── #}
+  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+    <div>
+      <a href="{{ url_for('leiter_uebersicht') }}" class="btn btn-sm btn-outline" style="margin-bottom:8px;">← Alle Sportarten</a>
+      <h2 style="margin-bottom:4px;">{{ sport_info.name }}</h2>
+      <p class="text-muted">{{ slot_info.name }}</p>
+    </div>
+    <div style="display:flex; gap:8px; align-items:center;">
+      <span class="badge {% if sport_detail.anzahl >= sport_info.max_teilnehmer %}badge-success{% elif sport_detail.anzahl > 0 %}badge-warning{% else %}badge-neutral{% endif %}" style="font-size:0.9rem;">
+        {{ sport_detail.anzahl }}/{{ sport_info.max_teilnehmer }} Teilnehmer
+      </span>
+      <a href="{{ url_for('sportart_export', sportart_id=sport_info.id, slot_id=slot_info.id) }}" class="btn btn-sm btn-outline">📥 CSV</a>
+    </div>
+  </div>
+
+  {# Treffpunkt / Details #}
+  <div class="card" style="margin-bottom:20px;">
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px;">
+      {% if sport_info.treffpunkt_zeit %}
+      <div>
+        <strong style="font-size:0.8rem;color:var(--gray-500);">🕐 Treffpunkt Zeit</strong>
+        <p style="margin-top:2px;">{{ sport_info.treffpunkt_zeit }}</p>
+      </div>
+      {% endif %}
+      {% if sport_info.treffpunkt_ort %}
+      <div>
+        <strong style="font-size:0.8rem;color:var(--gray-500);">📍 Treffpunkt Ort</strong>
+        <p style="margin-top:2px;">{{ sport_info.treffpunkt_ort }}</p>
+      </div>
+      {% endif %}
+      {% if sport_info.material %}
+      <div>
+        <strong style="font-size:0.8rem;color:var(--gray-500);">🎒 Material</strong>
+        <p style="margin-top:2px;">{{ sport_info.material }}</p>
+      </div>
+      {% endif %}
+      {% if sport_info.leitung %}
+      <div>
+        <strong style="font-size:0.8rem;color:var(--gray-500);">👤 Leitung</strong>
+        <p style="margin-top:2px;">{{ sport_info.leitung }}</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  {# Teilnehmer-Liste #}
+  <div class="card" style="padding:0;">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Zelt</th>
+            <th>Name</th>
+            <th>Schwimmen</th>
+            <th>Medikamente</th>
+            <th>Kommentar</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if sport_detail.teilnehmer %}
+            {% for tn in sport_detail.teilnehmer %}
+            <tr>
+              <td><span class="badge badge-info">{{ tn.zelt }}</span></td>
+              <td style="font-weight:500;">{{ tn.nachname }} {{ tn.vorname }}</td>
+              <td style="font-size:0.85rem; max-width:260px;">
+                {% if tn.schwimmen %}
+                  {% set swim = tn.schwimmen.lower() %}
+                  {% if 'nicht' in swim or 'schlecht' in swim %}
+                    <span style="color:var(--danger);">⚠️ {{ tn.schwimmen }}</span>
+                  {% elif 'sicher' in swim %}
+                    <span style="color:var(--success);">✅ Schwimmfähig</span>
+                  {% else %}
+                    {{ tn.schwimmen }}
+                  {% endif %}
+                {% else %}
+                  <span class="text-muted">—</span>
+                {% endif %}
+              </td>
+              <td style="font-size:0.85rem; max-width:200px;">
+                {% if tn.medikamente %}
+                  <span style="color:var(--warning); font-weight:500;">💊 {{ tn.medikamente }}</span>
+                {% else %}
+                  <span class="text-muted">—</span>
+                {% endif %}
+              </td>
+              <td style="font-size:0.85rem; max-width:250px;">
+                {% if tn.kommentar %}
+                  {{ tn.kommentar }}
+                {% else %}
+                  <span class="text-muted">—</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="5" style="text-align:center; padding:32px; color:var(--gray-500);">
+                Noch keine Teilnehmer zugeteilt.
+              </td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+{% else %}
+  {# ─── AUSWAHL: Alle Sportarten ─── #}
+  <h2 style="margin-bottom:8px;">Sportart auswählen</h2>
+  <p class="text-muted mb-2">Wähle deine Sportart, um die Detail-Ansicht mit Teilnehmern, Treffpunkt und wichtigen Infos zu sehen.</p>
+
+  {% for slot in slots %}
+  <div class="card">
+    <div class="card-header">
+      <h3>{{ slot.name }}</h3>
+      <span class="text-muted">{{ slot_sportarten[slot.id]|length }} Sportarten</span>
+    </div>
+
+    <div class="grid-4">
+      {% for s in slot_sportarten[slot.id] %}
+      <a href="{{ url_for('leiter_uebersicht', sportart_id=s.id) }}"
+         class="sport-card"
+         style="display:block; text-decoration:none; color:inherit; cursor:pointer;
+                {% if s.zugeteilt == s.max_teilnehmer %}border-color:var(--success);{% elif s.zugeteilt > 0 %}border-color:var(--warning);{% endif %}"
+         onmouseover="this.style.boxShadow='0 2px 12px rgba(0,0,0,0.1)'"
+         onmouseout="this.style.boxShadow='none'">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <strong>{{ s.name }}</strong>
+          <span class="badge {% if s.zugeteilt == s.max_teilnehmer %}badge-success{% elif s.zugeteilt > 0 %}badge-warning{% else %}badge-neutral{% endif %}">
+            {{ s.zugeteilt }}/{{ s.max_teilnehmer }}
+          </span>
+        </div>
+        <div style="font-size:0.8rem; color:var(--gray-500);">
+          {% if s.treffpunkt_zeit or s.treffpunkt_ort or s.leitung %}
+            <div>📍 {{ s.treffpunkt_ort or '—' }}</div>
+            <div>🕐 {{ s.treffpunkt_zeit or '—' }}</div>
+            <div>👤 {{ s.leitung or '—' }}</div>
+          {% else %}
+            <span class="text-muted">Keine Details</span>
+          {% endif %}
+        </div>
+        <div style="margin-top:8px; font-size:0.75rem; color:var(--primary);">
+          Details anzeigen →
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+{% endif %}
+
+{% endblock %}

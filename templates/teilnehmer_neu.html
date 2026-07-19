@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block titel %}Teilnehmer anlegen{% endblock %}
+{% block content %}
+
+<div class="card" style="max-width: 600px; margin: 20px auto;">
+    <h2>👤 Teilnehmer anlegen</h2>
+    <p style="color:#666; margin-bottom: 20px;">
+        Einmal anlegen, danach kannst du dich für jeden Nachmittag separat anmelden.
+    </p>
+
+    <form method="POST">
+        <div class="grid-2">
+            <div>
+                <label for="anrede">Anrede</label>
+                <input type="text" id="anrede" name="anrede" placeholder="z.B. Herr, Frau">
+            </div>
+            <div>
+                <label for="vorname">Vorname *</label>
+                <input type="text" id="vorname" name="vorname" required placeholder="Dein Vorname">
+            </div>
+        </div>
+        <div class="grid-2">
+            <div>
+                <label for="nachname">Nachname *</label>
+                <input type="text" id="nachname" name="nachname" required placeholder="Dein Nachname">
+            </div>
+            <div>
+                <label for="geburtsdatum">Geburtsdatum *</label>
+                <input type="text" id="geburtsdatum" name="geburtsdatum" required placeholder="z.B. 12.11.2007">
+            </div>
+        </div>
+        <div>
+            <label for="zelt">Zelt / Gruppe *</label>
+            <input type="text" id="zelt" name="zelt" required placeholder="Zelt / Gruppe">
+        </div>
+
+        <label for="kommentar">Kommentar</label>
+        <input type="text" id="kommentar" name="kommentar" placeholder="Allergien, Besonderheiten, ...">
+
+        <div class="grid-2">
+            <div>
+                <label for="schwimmen">Schwimmen</label>
+                <select id="schwimmen" name="schwimmen">
+                    <option value="">—</option>
+                    <option value="Ja">Ja</option>
+                    <option value="Nein">Nein</option>
+                    <option value="mit Begleitung">mit Begleitung</option>
+                </select>
+            </div>
+            <div>
+                <label for="medikamente">Medikamente</label>
+                <input type="text" id="medikamente" name="medikamente" placeholder="z.B. Cetirizin, Asthma-Spray">
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-success">✅ Weiter zu den Anmeldungen</button>
+        <a href="/" class="btn btn-outline">🔙 Zurück</a>
+    </form>
+</div>
+
+{% endblock %}

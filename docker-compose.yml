@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+  web:
+    build: .
+    container_name: jugendlager-tenero
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./daten:/data
+    environment:
+      - SECRET_KEY=tenero-wahl-sport-secret
+    restart: unless-stopped

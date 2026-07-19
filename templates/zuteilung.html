@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block titel %}Zuteilung {{ slot.name }}{% endblock %}
+{% block content %}
+
+<h2 style="margin: 20px 0;">📋 Zuteilung: {{ slot.name }}</h2>
+
+<!-- Statistik-Karten -->
+<div style="display:flex; gap:16px; flex-wrap:wrap; margin-bottom:20px;">
+    <div class="card" style="flex:1; min-width:120px; text-align:center;">
+        <div style="font-size:1.8rem; font-weight:700; color:#667eea;">{{ total_angemeldet }}</div>
+        <div class="text-muted">Angemeldet</div>
+    </div>
+    <div class="card" style="flex:1; min-width:120px; text-align:center;">
+        <div style="font-size:1.8rem; font-weight:700; color:#28a745;">{{ total_zugeteilt }}</div>
+        <div class="text-muted">Zugeteilt ✅</div>
+    </div>
+    <div class="card" style="flex:1; min-width:120px; text-align:center;">
+        <div style="font-size:1.8rem; font-weight:700; color:{% if nicht_zugeteilt|length > 0 %}#dc3545{% else %}#28a745{% endif %};">
+            {{ nicht_zugeteilt|length }}
+        </div>
+        <div class="text-muted">Nicht zugeteilt ⚠️</div>
+    </div>
+    <div class="card" style="flex:1; min-width:120px; text-align:center;">
+        <div style="font-size:1.8rem; font-weight:700; color:{% if ueberbucht|length > 0 %}#dc3545{% else %}#28a745{% endif %};">
+            {{ ueberbucht|length }}
+        </div>
+        <div class="text-muted">Überbucht 🔴</div>
+    </div>
+</div>
+
+<!-- ⚠️ Konflikte -->
+{% if nicht_zugeteilt or ueberbucht %}
+<div class="card" style="border: 2px solid #dc3545; background: #fff5f5;">
+    <h3 style="color:#dc3545;">⚠️ Konflikte erkennen</h3>
+
+    {% if nicht_zugeteilt %}
+    <h4 style="margin-top:12px;">Teilnehmer ohne Zuteilung ({{ nicht_zugeteilt|length }})</h4>
+    <table>
+        <tr>
+            <th>Zelt</th>
+            <th>Name</th>
+            <th>Gewählte Sportart</th>
+        </tr>
+        {% for tn in nicht_zugeteilt %}
+        <tr style="background:#fff3cd;">
+            <td><span class="badge badge-info">{{ tn.zelt }}</span></td>
+            <td><strong>{{ tn.nachname }}</strong> {{ tn.vorname }}</td>
+            <td><span class="badge badge-success">{{ tn.w1 }}</span></td>
+            <td><span class="badge badge-warning">{{ tn.w2 }}</span></td>
+            <td><span class="badge badge-danger">{{ tn.w3 }}</span></td>
+        </tr>
+        {% endfor %}
+    </table>
+    <p class="text-muted">💡 Alle 3 Wahlen sind voll – manuell zuweisen oder Kapazität erhöhen.</p>
+    {% endif %}
+
+    {% if ueberbucht %}
+    <h4 style="margin-top:16px;">Überbuchte Sportarten</h4>
+    <table>
+        <tr>
+            <th>Sportart</th>
+            <th>Max</th>
+            <th>Zugeteilt</th>
+            <th>⚠️ Überbucht um</th>
+        </tr>
+        {% for u in ueberbucht %}
+        <tr style="background:#f8d7da;">
+            <td><strong>{{ u.name }}</strong></td>
+            <td>{{ u.max }}</td>
+            <td>{{ u.zugeteilt }}</td>
+            <td><strong style="color:#dc3545;">+{{ u.zugeteilt - u.max }}</strong></td>
+        </tr>
+        {% endfor %}
+    </table>
+    <p class="text-muted">💡 Zu viele Teilnehmer manuell zugewiesen – korrigieren in der Einteilung.</p>
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- ✅ Zuteilung pro Sportart -->
+<div class="card">
+    <h3>✅ Zuteilung pro Sportart</h3>
+    <div style="display:flex; flex-wrap:wrap; gap:16px;">
+        {% for s in sport_einteilung %}
+        <div style="flex:1; min-width:280px; background:#f8f9fa; border-radius:8px; padding:16px;
+                    {% if s.zugeteilt > s.max_teilnehmer %}border:2px solid #dc3545;{% elif s.zugeteilt == s.max_teilnehmer %}border:2px solid #28a745;{% else %}border:2px solid #ddd;{% endif %}">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong>{{ s.name }}</strong>
+                <span>
+                    {% if s.zugeteilt > s.max_teilnehmer %}
+                        <span class="badge badge-danger">{{ s.zugeteilt }}/{{ s.max_teilnehmer }} 🔴</span>
+                    {% elif s.zugeteilt == s.max_teilnehmer %}
+                        <span class="badge badge-success">{{ s.zugeteilt }}/{{ s.max_teilnehmer }} ✅</span>
+                    {% elif s.zugeteilt > 0 %}
+                        <span class="badge badge-warning">{{ s.zugeteilt }}/{{ s.max_teilnehmer }}</span>
+                    {% else %}
+                        <span class="badge badge-secondary">0/{{ s.max_teilnehmer }}</span>
+                    {% endif %}
+                </span>
+            </div>
+
+            {% if sport_detail[s.id] %}
+            <table style="margin-top:8px; font-size:0.85rem;">
+                <tr>
+                    <th>Zelt</th>
+                    <th>Name</th>
+                </tr>
+                {% for tn in sport_detail[s.id] %}
+                <tr>
+                    <td><span class="badge badge-info">{{ tn.zelt }}</span></td>
+                    <td>{{ tn.nachname }} {{ tn.vorname }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% else %}
+            <p class="text-muted" style="margin-top:8px;">— keine Zuteilungen —</p>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Aktionen -->
+<div style="margin: 20px 0; display:flex; gap:12px; flex-wrap:wrap;">
+    <a href="{{ url_for('admin_export', slot_id=slot.id) }}" class="btn btn-success">📥 CSV exportieren</a>
+    <button onclick="window.print()" class="btn btn-primary">🖨️ Drucken</button>
+    <a href="{{ url_for('admin_dashboard') }}#slot-{{ slot.id }}" class="btn btn-outline">🔙 Zur Einteilung</a>
+</div>
+
+<style>
+@media print {
+    header, footer, .btn, .card:first-of-type { display: none !important; }
+    body { background: white !important; }
+    .card { break-inside: avoid; box-shadow: none; border: 1px solid #ddd; }
+}
+</style>
+
+{% endblock %}

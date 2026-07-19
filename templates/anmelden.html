@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block titel %}Anmelden – Jugendlager Tenero{% endblock %}
+{% block content %}
+
+<div class="card" style="max-width: 450px; margin: 20px auto;">
+    <h2>✋ Für einen Nachmittag anmelden</h2>
+    <p style="color:#666; margin-bottom: 20px;">
+        Gib deinen Namen und dein Zelt ein. Wenn du bereits erfasst bist,<br>
+        kannst du dich direkt für einen Slot anmelden.
+    </p>
+
+    <form method="POST">
+        <div class="grid-2">
+            <div>
+                <label for="vorname">Vorname *</label>
+                <input type="text" id="vorname" name="vorname" required placeholder="Dein Vorname">
+            </div>
+            <div>
+                <label for="nachname">Nachname *</label>
+                <input type="text" id="nachname" name="nachname" required placeholder="Dein Nachname">
+            </div>
+        </div>
+
+        <label for="zelt">Zelt / Gruppe *</label>
+        <input type="text" id="zelt" name="zelt" required placeholder="Zelt / Gruppe">
+
+        <button type="submit" class="btn btn-success" style="width:100%; font-size:1.05rem; padding:12px;">🔍 Weiter zur Anmeldung</button>
+    </form>
+
+</div>
+
+{% endblock %}

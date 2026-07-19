@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Kurzanleitung – Jugendlager Tenero</title>
+<style>
+  @page {
+    size: A4;
+    margin: 20mm 18mm;
+    @bottom-center {
+      content: "Jugendlager Tenero – Kurzanleitung | Seite " counter(page) " von " counter(pages);
+      font-size: 8pt;
+      color: #888;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, 'Helvetica Neue', 'Segoe UI', Arial, sans-serif;
+    font-size: 10pt;
+    line-height: 1.5;
+    color: #1e293b;
+  }
+  h1 { font-size: 20pt; margin-bottom: 4px; color: #4f46e5; }
+  h2 {
+    font-size: 14pt;
+    margin: 28px 0 12px 0;
+    padding-bottom: 4px;
+    border-bottom: 2px solid #e2e8f0;
+    color: #4f46e5;
+  }
+  h3 { font-size: 11pt; margin: 20px 0 8px 0; color: #334155; }
+  p, li { margin-bottom: 6px; }
+  ul, ol { padding-left: 22px; margin-bottom: 10px; }
+  .box {
+    background: #f8fafc;
+    border-left: 4px solid #4f46e5;
+    padding: 10px 14px;
+    margin: 12px 0;
+    border-radius: 4px;
+  }
+  .box.green { border-left-color: #059669; }
+  .box.orange { border-left-color: #d97706; }
+  .box.red { border-left-color: #dc2626; }
+  code {
+    background: #f1f5f9;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 9pt;
+    font-weight: 600;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+    font-size: 9.5pt;
+  }
+  th {
+    background: #f1f5f9;
+    text-align: left;
+    padding: 6px 10px;
+    border-bottom: 2px solid #cbd5e1;
+    font-weight: 600;
+  }
+  td { padding: 5px 10px; border-bottom: 1px solid #e2e8f0; }
+  .page-break { page-break-before: always; }
+  .footer { margin-top: 30px; padding-top: 10px; border-top: 1px solid #e2e8f0; font-size: 8pt; color: #94a3b8; }
+  .tag {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 100px;
+    font-size: 8pt;
+    font-weight: 600;
+  }
+  .tag.admin { background: #fee2e2; color: #991b1b; }
+  .tag.leiter { background: #dbeafe; color: #1e40af; }
+  .tag.tn { background: #d1fae5; color: #065f46; }
+  .two-col { display: flex; gap: 16px; }
+  .two-col > div { flex: 1; }
+</style>
+</head>
+<body>
+
+<h1>Jugendlager Tenero – Kurzanleitung</h1>
+<p style="color:#64748b; font-size:10pt; margin-bottom:20px;">Wahlsportarten-Plattform · Stand: Juli 2026</p>
+
+<!-- ============================================================ -->
+<h2>1. Teilnehmer-Anmeldung (Startseite)</h2>
+
+<p>Die Startseite (<code>/</code>) führt direkt zur Anmeldung. Teilnehmer geben Vorname, Nachname und Zelt ein:</p>
+
+<div class="box green">
+<strong>Ablauf:</strong>
+<ol>
+  <li>Name + Zelt eingeben → <strong>„Weiter zur Anmeldung"</strong></li>
+  <li>Falls nicht gefunden: <strong>„Neuen Teilnehmer registrieren"</strong> (dort auch Schwimmfähigkeit, Medikamente, Kommentar erfassbar)</li>
+  <li>Slot auswählen (z.B. Dienstag) → Sportart wählen → Bestätigung</li>
+  <li>Pro Slot kann nur <strong>eine</strong> Sportart gewählt werden</li>
+  <li>Anmeldung pro Slot separat möglich</li>
+</ol>
+</div>
+
+<p>Felder bei Registrierung:</p>
+<ul>
+  <li><strong>Schwimmen</strong> – Schwimmfähigkeit (wichtig für Wassersport)</li>
+  <li><strong>Medikamente</strong> – Medikamentenangaben</li>
+  <li><strong>Kommentar</strong> – Zusätzliche Hinweise</li>
+</ul>
+
+
+<!-- ============================================================ -->
+<h2>2. Leiter-Ansicht (read-only)</h2>
+
+<div class="box">
+<p><strong>Zugang:</strong> <code>/leiter</code> · Code: <code>lager2025</code></p>
+</div>
+
+<h3>2.1 Sportart auswählen</h3>
+<p>Nach dem Login siehst du alle Sportarten, gruppiert nach Slot (Dienstag, Mittwoch, …). Jede Karte zeigt:</p>
+<ul>
+  <li>Sportart-Name</li>
+  <li>Belegung (z.B. <span class="tag tn">3/12</span>)</li>
+  <li>📍 Treffpunkt Ort</li>
+  <li>🕐 Treffpunkt Zeit</li>
+  <li>👤 Leitung / Betreuer</li>
+</ul>
+
+<h3>2.2 Detail-Ansicht</h3>
+<p>Klick auf eine Sportart öffnet die Detail-Seite mit:</p>
+
+<table>
+  <tr><th>Bereich</th><th>Details</th></tr>
+  <tr><td>📌 Infos</td><td>Sportart-Name, Slot, Belegung <span class="tag tn">X/Y</span></td></tr>
+  <tr><td>🕐 Treffpunkt</td><td>Zeit + Ort für die Sportart</td></tr>
+  <tr><td>🎒 Material</td><td>Mitbring-Liste</td></tr>
+  <tr><td>👤 Leitung</td><td>Verantwortliche Personen</td></tr>
+  <tr><td>🧑‍🤝‍🧑 Teilnehmer-Tabelle</td><td>Alle zugeteilten TN mit:</td></tr>
+  <tr><td></td><td>– Zelt / Gruppe</td></tr>
+  <tr><td></td><td>– Name (Vorname + Nachname)</td></tr>
+  <tr><td></td><td>– <strong>Schwimmen</strong> (⚠️ rot bei unsicher/nicht schwimmfähig, ✅ grün bei sicher)</td></tr>
+  <tr><td></td><td>– <strong>Medikamente</strong> (💊 gelb hervorgehoben)</td></tr>
+  <tr><td></td><td>– <strong>Kommentar</strong> (zusätzliche Hinweise)</td></tr>
+</table>
+
+<h3>2.3 CSV-Export</h3>
+<p>Jede Detail-Seite hat einen <strong>📥 CSV</strong>-Button für den Download der Teilnehmerliste inkl. Treffpunkt-Infos.</p>
+
+
+<!-- ============================================================ -->
+<h2 class="page-break">3. Admin-Bereich</h2>
+
+<div class="box">
+<p><strong>Zugang:</strong> <code>/admin</code> · Code: <code>tenero2025</code></p>
+</div>
+
+<h3>3.1 Dashboard – Übersicht</h3>
+<p>Das Admin-Dashboard ist in mehrere Abschnitte gegliedert:</p>
+
+<table>
+  <tr><th>Abschnitt</th><th>Beschreibung</th></tr>
+  <tr><td>📋 Sportarten</td><td>Alle Sportarten verwalten (Name, max. Teilnehmer)</td></tr>
+  <tr><td>📅 Slots</td><td>Slots aktivieren/deaktivieren, Sportarten zuordnen</td></tr>
+  <tr><td>👥 Teilnehmer</td><td>Alle TN mit Zelt, Status, Aktionen</td></tr>
+  <tr><td>📅 Einteilung</td><td>Manuelle & automatische Zuteilung pro Slot</td></tr>
+  <tr><td>📋 Cross-Check</td><td>TN-Liste mit Soll-Liste vergleichen</td></tr>
+</table>
+
+<h3>3.2 Sportarten verwalten</h3>
+<ul>
+  <li><strong>Neue Sportart:</strong> Name + max. TN eingeben → Erstellen</li>
+  <li><strong>Bearbeiten:</strong> Klick auf ⚙️ – dort können gesetzt werden:
+    <ul>
+      <li>🕐 Treffpunkt Zeit</li>
+      <li>📍 Treffpunkt Ort</li>
+      <li>🎒 Material</li>
+      <li>👤 Leitung</li>
+      <li>🚫 Ausschluss nach Hauptsportart</li>
+    </ul>
+  </li>
+  <li><strong>Löschen:</strong> ❌ – entfernt auch alle Anmeldungen/Einteilungen</li>
+</ul>
+
+<h3>3.3 Slots & Freischaltung</h3>
+<ul>
+  <li>Slots können aktiviert (<span class="tag green">🟢</span>) oder deaktiviert (<span class="tag" style="background:#fef2f2;color:#991b1b;">🔴</span>) werden</li>
+  <li>Nur aktive Slots sind für Teilnehmer sichtbar</li>
+  <li>Sportarten können pro Slot zugeordnet/entfernt werden</li>
+</ul>
+
+<h3>3.4 Einteilung (Zuteilung)</h3>
+
+<div class="box orange">
+<strong>Wichtig:</strong> Zuerst Anmeldungen abwarten, dann einteilen!
+</div>
+
+<p><strong>Auto-Assignment:</strong></p>
+<ol>
+  <li>Pro Slot auf <strong>🤖 Auto-Assignment starten</strong> klicken</li>
+  <li>Das System teilt nach Wunsch-Sportart und Zelt-Priorität zu</li>
+  <li>Teilnehmer ohne Platz werden aufgelistet</li>
+</ol>
+
+<p><strong>Zelt-Priorität:</strong></p>
+<ul>
+  <li>Zelte mit Priorität <strong>1</strong> werden zuerst berücksichtigt</li>
+  <li>Höhere Zahl = niedrigere Priorität (Default: 99)</li>
+  <li>Kann pro Slot individuell gesetzt werden</li>
+</ul>
+
+<p><strong>Manuelle Einteilung:</strong></p>
+<ul>
+  <li>Dropdown pro TN – Sportart auswählen</li>
+  <li><strong>💾 Einteilung speichern</strong> nicht vergessen!</li>
+  <li>📋 <strong>Zuteilung & Export</strong> zeigt Details und Überbuchungen</li>
+</ul>
+
+<h3>3.5 Cross-Check</h3>
+<ul>
+  <li>CSV/Liste mit Soll-Teilnehmern hochladen</li>
+  <li>System zeigt: gefunden, fehlend, zusätzlich registriert</li>
+  <li>Ideal zum Prüfen vor dem Lager</li>
+</ul>
+
+<h3>3.6 Exporte</h3>
+<ul>
+  <li>📥 CSV-Export pro Slot (gruppiert nach Sportart)</li>
+  <li>📋 Zuteilungsübersicht mit Konflikterkennung</li>
+  <li>📊 Zusammenfassung mit Statistiken</li>
+</ul>
+
+
+<!-- ============================================================ -->
+<h2 class="page-break">4. Tipps & Hinweise</h2>
+
+<div class="box green">
+<h3>✅ Best Practices</h3>
+<ul>
+  <li><strong>Hauptsportart:</strong> Beim Import erfassen → dann Ausschlüsse in Sportarten möglich</li>
+  <li><strong>Schwimmfähigkeit:</strong> Bei Wassersportarten kritisch – in der Detail-Ansicht farblich markiert</li>
+  <li><strong>Medikamente:</strong> Wichtige Info für Leiter – in der Detail-Ansicht prominent sichtbar</li>
+  <li><strong>Backups:</strong> Werden automatisch bei jeder Anmeldung erstellt (max. 50 Versionen)</li>
+  <li><strong>Drucken:</strong> Die Leiter-Ansicht hat einen 🖨️ Druck-Button</li>
+</ul>
+</div>
+
+<div class="box orange">
+<h3>⚠️ Häufige Fehler</h3>
+<ul>
+  <li>Teilnehmer existiert nicht → zuerst registrieren lassen</li>
+  <li>Slot inaktiv → im Admin-Dashboard aktivieren</li>
+  <li>Max. Teilnehmer erreicht → Kapazität erhöhen oder neuen Slot nutzen</li>
+  <li>Keine Sportart zugeordnet → im Admin Slot-Sportarten verknüpfen</li>
+</ul>
+</div>
+
+<div class="box red">
+<h3>🚨 Notfall</h3>
+<ul>
+  <li>Fehlerhafte Anmeldung löschen: via Admin-Dashboard (❌ hinter der Anmeldung)</li>
+  <li>Komplette Einteilung löschen: in der Zuteilungs-Übersicht</li>
+  <li>Backups liegen unter <code>backups/</code> im Projektordner</li>
+</ul>
+</div>
+
+<!-- ============================================================ -->
+<h2>5. Routen-Übersicht</h2>
+
+<table>
+  <tr><th>Route</th><th>Beschreibung</th><th>Code</th></tr>
+  <tr><td><code>/</code></td><td>Weiterleitung zur Anmeldung</td><td>–</td></tr>
+  <tr><td><code>/anmelden</code></td><td>Teilnehmer-Anmeldung (Name + Zelt)</td><td>–</td></tr>
+  <tr><td><code>/teilnehmer/neu</code></td><td>Neuen Teilnehmer registrieren</td><td>–</td></tr>
+  <tr><td><code>/leiter</code></td><td>Leiter-Login</td><td><code>lager2025</code></td></tr>
+  <tr><td><code>/leiter/uebersicht</code></td><td>Sportart-Auswahl</td><td><code>lager2025</code></td></tr>
+  <tr><td><code>/leiter/uebersicht/&lt;id&gt;</code></td><td>Detail-Ansicht pro Sportart</td><td><code>lager2025</code></td></tr>
+  <tr><td><code>/admin</code></td><td>Admin-Login</td><td><code>tenero2025</code></td></tr>
+  <tr><td><code>/admin/dashboard</code></td><td>Admin-Dashboard</td><td><code>tenero2025</code></td></tr>
+  <tr><td><code>/admin/zusammenfassung</code></td><td>Statistik & Übersicht</td><td><code>tenero2025</code></td></tr>
+  <tr><td><code>/anleitung</code></td><td>Online-Kurzanleitung</td><td>–</td></tr>
+</table>
+
+<div class="footer">
+<p>Jugendlager Tenero – Wahlsportarten · App basiert auf Flask + SQLite</p>
+<p>Entwickelt für das Jugendlager Tenero 2026</p>
+</div>
+
+</body>
+</html>

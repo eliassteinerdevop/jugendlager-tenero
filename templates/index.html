@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block titel %}Wahlsportarten – Jugendlager Tenero{% endblock %}
+{% block content %}
+
+<div style="text-align:center; padding: 20px 0;">
+    <h2>🏅 Wahlsportarten Jugendlager Tenero</h2>
+    <p style="color:#666; margin-top: 8px;">
+        Jeder Nachmittag hat eigene Sportarten. Melde dich pro Nachmittag einzeln an!
+    </p>
+</div>
+
+<h3 style="margin-bottom: 16px;">📅 Übersicht pro Nachmittag</h3>
+
+{% for slot in slots %}
+<div class="slot-card {% if slot.aktiv %}offen{% else %}erledigt{% endif %}">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div>
+            <h3 style="margin-bottom:4px;">
+                {{ slot.name }}
+                {% if not slot.aktiv %}
+                    <span class="badge badge-secondary">🔒 Geschlossen</span>
+                {% else %}
+                    <span class="badge badge-success">🟢 Offen</span>
+                {% endif %}
+            </h3>
+            <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;">
+                {% set sports = slot_sportarten[slot.id] %}
+                {% if sports %}
+                    {% for s in sports %}
+                        <span class="badge badge-info">{{ s.name }}
+                            <span class="text-muted">({{ s.belegt }}/{{ s.max_teilnehmer }})</span>
+                        </span>
+                    {% endfor %}
+                {% else %}
+                    <span class="text-muted">Noch keine Sportarten zugewiesen</span>
+                {% endif %}
+            </div>
+        </div>
+        <div>
+            {% if slot.aktiv %}
+                <a href="/anmelden" class="btn btn-success btn-sm">✋ Anmelden</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<div style="text-align:center; margin: 24px 0;">
+    <a href="/anmelden" class="btn btn-success" style="font-size:1.1rem; padding:14px 36px;">✋ Jetzt anmelden</a>
+</div>
+
+{% endblock %}

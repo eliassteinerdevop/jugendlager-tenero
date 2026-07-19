@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block titel %}Admin Login{% endblock %}
+{% block content %}
+<div class="card" style="max-width: 400px; margin: 40px auto;">
+    <h2>🔐 Admin Zugang</h2>
+    <p style="color:#666; margin-bottom: 20px;">Gib den Admin-Code ein:</p>
+    <form method="POST" action="{{ url_for('admin_login') }}">
+        <label for="code">Admin-Code</label>
+        <input type="password" id="code" name="code" required placeholder="Admin-Code eingeben">
+        <button type="submit" class="btn btn-primary">🔓 Freischalten</button>
+    </form>
+</div>
+{% endblock %}

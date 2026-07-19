@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block titel %}Sportart bearbeiten{% endblock %}
+{% block content %}
+
+<div class="card" style="max-width: 550px; margin: 20px auto;">
+    <h2>⚙️ {{ sport.name }} bearbeiten</h2>
+
+    <form method="POST">
+        <div class="grid-2">
+            <div>
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" value="{{ sport.name }}" required>
+            </div>
+            <div>
+                <label for="max_teilnehmer">Max. Teilnehmer</label>
+                <input type="number" id="max_teilnehmer" name="max_teilnehmer" value="{{ sport.max_teilnehmer }}" min="1">
+            </div>
+        </div>
+
+        <label for="treffpunkt_zeit">🕐 Treffpunkt (Zeit)</label>
+        <input type="text" id="treffpunkt_zeit" name="treffpunkt_zeit"
+               value="{{ sport.treffpunkt_zeit }}" placeholder="z.B. 14:00 Uhr beim Eingang">
+
+        <label for="treffpunkt_ort">📍 Treffpunkt Ort</label>
+        <input type="text" id="treffpunkt_ort" name="treffpunkt_ort"
+               value="{{ sport.treffpunkt_ort }}" placeholder="z.B. Sportplatz Tenero, Halle A">
+
+        <label for="material">🎒 Material</label>
+        <input type="text" id="material" name="material"
+               value="{{ sport.material }}" placeholder="z.B. Turnschuhe, Badehose, Handtuch">
+
+        <label for="leitung">👤 Leitung</label>
+        <input type="text" id="leitung" name="leitung"
+               value="{{ sport.leitung }}" placeholder="z.B. Anna Muster, Peter Beispiel">
+
+        <label for="ausschluss_hauptsportarten">🚫 Nicht erlaubt für Hauptsportart</label>
+        {% set ausgeschlossen = sport.ausschluss_hauptsportarten.split(',') if sport.ausschluss_hauptsportarten else [] %}
+        <select id="ausschluss_hauptsportarten" name="ausschluss_hauptsportarten" multiple style="height:120px;">
+            {% for hs in hauptsportarten %}
+                <option value="{{ hs }}" {% if hs in ausgeschlossen %}selected{% endif %}>{{ hs }}</option>
+            {% endfor %}
+        </select>
+        <p class="text-muted" style="font-size:0.8rem; margin-top:-10px;">
+            Teilnehmer mit diesen Hauptsportarten können diese Sportart nicht wählen.
+            <strong>Cmd/Klick</strong> für mehrere Auswählen.
+        </p>
+
+        <div style="display:flex; gap:12px; margin-top:8px;">
+            <button type="submit" class="btn btn-success">💾 Speichern</button>
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline">🔙 Abbrechen</a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

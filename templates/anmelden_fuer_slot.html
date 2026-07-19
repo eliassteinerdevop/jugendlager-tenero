@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block titel %}Anmeldung {{ slot.name }} – {{ tn.vorname }} {{ tn.nachname }}{% endblock %}
+{% block content %}
+
+<div class="card" style="max-width: 500px; margin: 20px auto;">
+    <h2>✋ {{ slot.name }}</h2>
+    <p style="color:#666; margin-bottom: 8px;">
+        {{ tn.vorname }} {{ tn.nachname }} · <strong>{{ tn.zelt }}</strong>
+    </p>
+
+    {% if tn.hauptsportart %}
+    <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:var(--radius); padding:8px 12px; margin-bottom:16px; font-size:0.85rem;">
+        🏅 <strong>Deine Hauptsportart:</strong> {{ tn.hauptsportart.split('(')[0].strip() }}
+    </div>
+    {% endif %}
+
+    {% if existing %}
+    <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:var(--radius); padding:8px 12px; margin-bottom:12px; font-size:0.85rem;">
+        ✏️ Du bearbeitest deine bestehende Anmeldung.
+    </div>
+    {% endif %}
+
+    <p style="color:#666; margin-bottom: 16px;">
+        Wähle deine 1., 2. und 3. Wahl für diesen Nachmittag.
+    </p>
+
+    <form method="POST">
+        {% set wahlen = [
+            ("wahl1", "⭐ 1. Wahl", existing.wahl1_id if existing else None),
+            ("wahl2", "⭐ 2. Wahl", existing.wahl2_id if existing else None),
+            ("wahl3", "⭐ 3. Wahl", existing.wahl3_id if existing else None),
+        ] %}
+        <div class="grid-3">
+        {% for name, label, selected_id in wahlen %}
+            <div>
+                <label for="{{ name }}">{{ label }}</label>
+                <select id="{{ name }}" name="{{ name }}" required style="font-size:1rem; padding:10px;">
+                    <option value="">— Bitte wählen —</option>
+                    {% for s in sportarten %}
+                        {%- set ns = namespace(disabled=false) %}
+                        {%- if s.ausschluss_hauptsportarten and tn.hauptsportart %}
+                            {%- for a in s.ausschluss_hauptsportarten.replace(';',',').split(',') %}
+                                {%- set a_clean = a.strip().lower() %}
+                                {%- if a_clean and (a_clean in tn.hauptsportart.lower() or tn.hauptsportart.lower() in a_clean) %}
+                                    {%- set ns.disabled = true %}
+                                {%- endif %}
+                            {%- endfor %}
+                        {%- endif %}
+                        <option value="{{ s.id }}"
+                            {%- if ns.disabled %} disabled style="color:#999;"{% endif %}
+                            {%- if selected_id == s.id %} selected{% endif %}>
+                            {{ s.name }}
+                            {%- if ns.disabled %} (❌ nicht für dich){% endif %}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        {% endfor %}
+        </div>
+
+        <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top: 20px;">
+            <button type="submit" class="btn btn-success">✅ {{ 'Anmeldung aktualisieren' if existing else 'Für ' + slot.name + ' anmelden' }}</button>
+            <a href="{{ url_for('anmelden_slot_auswahl', tn_id=tn.id) }}" class="btn btn-outline">🔙 Zurück</a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

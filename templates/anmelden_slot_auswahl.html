@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block titel %}Slot wählen – {{ tn.vorname }} {{ tn.nachname }}{% endblock %}
+{% block content %}
+
+<div class="card" style="max-width: 650px; margin: 20px auto;">
+    <h2>✋ Hallo {{ tn.vorname }}!</h2>
+
+    <p style="color:#666; margin-bottom: 20px;">
+        Wähle für welchen Nachmittag du dich anmelden willst.
+        Nur <strong>freigeschaltete</strong> Slots werden angezeigt.
+    </p>
+
+    <div style="margin-bottom: 16px;">
+        {% for slot in slots %}
+            {% set sports = slot_sportarten[slot.id] %}
+            <div class="slot-card {% if slot.id in already %}erledigt{% else %}offen{% endif %}"
+                 style="margin-bottom:12px; padding:16px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                    <div>
+                        <strong style="font-size:1.1rem;">{{ slot.name }}</strong><br>
+                        {% if sports %}
+                            <span class="text-muted">
+                                {% for s in sports %}
+                                    {{ s.name }}{% if not loop.last %}, {% endif %}
+                                {% endfor %}
+                            </span>
+                        {% else %}
+                            <span class="text-muted">Keine Sportarten verfügbar</span>
+                        {% endif %}
+                    </div>
+                    <div>
+                        {% if slot.id in already %}
+                            <span class="badge badge-success">✅ Angemeldet</span>
+                            <a href="{{ url_for('anmelden_fuer_slot', tn_id=tn.id, slot_id=slot.id) }}"
+                               class="btn btn-sm" style="margin-left:6px;">✏️ Bearbeiten</a>
+                        {% elif sports %}
+                            <a href="{{ url_for('anmelden_fuer_slot', tn_id=tn.id, slot_id=slot.id) }}"
+                               class="btn btn-success btn-sm">✋ Anmelden</a>
+                        {% else %}
+                            <span class="badge badge-secondary">⏳ Bald</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="card" style="text-align:center;">
+                <p class="text-muted">🔒 Aktuell sind keine Slots freigeschaltet.<br>
+                Komm später wieder oder frag den Lagerleiter.</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <a href="/anmelden" class="btn btn-outline">🔙 Anderer Teilnehmer</a>
+    <a href="/" class="btn btn-outline">🔙 Zur Startseite</a>
+</div>
+
+{% endblock %}

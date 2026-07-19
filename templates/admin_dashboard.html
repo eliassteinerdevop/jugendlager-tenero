@@ -1,0 +1,412 @@
+{% extends "base.html" %}
+{% block titel %}Admin Dashboard{% endblock %}
+{% block content %}
+
+<h2 style="margin: 20px 0;">📋 Admin Dashboard</h2>
+
+<!-- ⏰ Slots freischalten -->
+<div class="card">
+    <h3>⏰ Slots verwalten</h3>
+    <p class="text-muted mb-2">Schalte Slots nach und nach frei. Nur aktive Slots werden bei der Anmeldung angezeigt.</p>
+    <div style="display:flex; flex-wrap:wrap; gap:12px;">
+        {% for slot in slots %}
+        <div style="flex:1; min-width:160px; background:#f8f9fa; border-radius:8px; padding:16px; text-align:center;
+                    {% if slot.aktiv %}border: 2px solid #28a745;{% else %}border: 2px solid #ddd;{% endif %}">
+            <strong>{{ slot.name }}</strong>
+            <div style="margin:8px 0;">
+                {% if slot.aktiv %}
+                    <span class="badge badge-success">🟢 Aktiv</span>
+                {% else %}
+                    <span class="badge badge-secondary">🔴 Geschlossen</span>
+                {% endif %}
+            </div>
+            <form class="inline-form" method="POST" action="{{ url_for('admin_slot_toggle', slot_id=slot.id) }}">
+                <input type="hidden" name="code" value="{{ code }}">
+                {% if slot.aktiv %}
+                    <button type="submit" class="btn btn-danger btn-sm">🔒 Schliessen</button>
+                {% else %}
+                    <button type="submit" class="btn btn-success btn-sm">🔓 Freischalten</button>
+                {% endif %}
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Sportarten verwalten -->
+<div class="card">
+    <h3>➕ Neue Sportart</h3>
+    <form method="POST" action="{{ url_for('sportart_neu') }}" style="display:flex; flex-wrap:wrap; gap:10px; align-items:end;">
+        <input type="hidden" name="code" value="{{ code }}">
+        <div style="flex:2; min-width:150px;">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" required placeholder="z.B. Fussball">
+        </div>
+        <div style="flex:1; min-width:80px;">
+            <label for="max_teilnehmer">Max. TN pro Slot</label>
+            <input type="number" id="max_teilnehmer" name="max_teilnehmer" value="20" min="1">
+        </div>
+        <button type="submit" class="btn btn-success">➕ Erstellen</button>
+    </form>
+    {% if sportarten %}
+    <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:12px;">
+        {% for s in sportarten %}
+            <div style="background:#f8f9fa; border-radius:8px; padding:8px 12px; min-width:200px;">
+                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                    <strong>{{ s.name }}</strong>
+                    <span class="text-muted">(max {{ s.max_teilnehmer }})</span>
+                    <a href="{{ url_for('sportart_bearbeiten', sportart_id=s.id) }}" class="btn btn-sm" style="padding:2px 8px;font-size:0.7rem;">⚙️</a>
+                    <form class="inline-form" method="POST" action="{{ url_for('sportart_loeschen', sportart_id=s.id) }}"
+                          onsubmit="return confirm('Sportart «{{ s.name }}» wirklich löschen?')">
+                        <input type="hidden" name="code" value="{{ code }}">
+                        <button type="submit" class="btn btn-danger btn-sm" style="padding:2px 8px;font-size:0.7rem;">✕</button>
+                    </form>
+                </div>
+                {% if s.treffpunkt_zeit or s.treffpunkt_ort or s.material or s.leitung %}
+                <div style="font-size:0.75rem; color:#666; margin-top:4px; line-height:1.5;">
+                    {% if s.treffpunkt_zeit %}<div>🕐 {{ s.treffpunkt_zeit }}</div>{% endif %}
+                    {% if s.treffpunkt_ort %}<div>📍 {{ s.treffpunkt_ort }}</div>{% endif %}
+                    {% if s.material %}<div>🎒 {{ s.material }}</div>{% endif %}
+                    {% if s.leitung %}<div>👤 {{ s.leitung }}</div>{% endif %}
+                </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+<!-- 📌 Sportarten pro Slot -->
+<div class="card">
+    <h3>📌 Sportarten pro Slot</h3>
+    <p class="text-muted mb-2">Lege fest, welche Sportarten an welchem Nachmittag angeboten werden.</p>
+    <div style="display:flex; flex-wrap:wrap; gap:16px;">
+        {% for slot in slots %}
+        <div style="flex:1; min-width:200px; background:#f8f9fa; border-radius:8px; padding:16px;">
+            <strong>{{ slot.name }}</strong>
+            {% set cap = slot_capacity[slot.id] %}
+            <div style="font-size:0.8rem; margin-bottom:6px;">
+                <span class="badge badge-info">{{ cap.belegt }}/{{ cap.total }} Plätze belegt</span>
+                <span class="badge badge-success">{{ cap.frei }} frei</span>
+            </div>
+            <div style="margin:8px 0; display:flex; flex-wrap:wrap; gap:4px;">
+                {% for d in cap.details %}
+                    {% set sid = d.id %}
+                    <span style="background:#d1ecf1; border-radius:4px; padding:2px 8px; font-size:0.8rem; display:flex; align-items:center; gap:4px;">
+                        {{ d.name }}
+                        <span style="font-size:0.7rem;color:#666;">({{ d.belegt }}/{{ d.max }})</span>
+                        <form class="inline-form" method="POST" action="{{ url_for('slot_sportart_entfernen', slot_id=slot.id, sportart_id=sid) }}">
+                            <input type="hidden" name="code" value="{{ code }}">
+                            <button type="submit" style="background:none;border:none;cursor:pointer;color:#dc3545;font-weight:bold;padding:0;">×</button>
+                        </form>
+                    </span>
+                {% else %}
+                    <span class="text-muted">— keine —</span>
+                {% endfor %}
+            </div>
+            <form method="POST" action="{{ url_for('slot_sportart_hinzufuegen') }}" style="display:flex; gap:4px; margin-top:8px;">
+                <input type="hidden" name="code" value="{{ code }}">
+                <input type="hidden" name="slot_id" value="{{ slot.id }}">
+                <select name="sportart_id" required style="flex:1; padding:6px; font-size:0.85rem; border:1px solid #ddd; border-radius:4px;">
+                    <option value="">—</option>
+                    {% for s in sportarten %}
+                        {% if s.id not in slot_sportarten[slot.id] %}
+                            <option value="{{ s.id }}">{{ s.name }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-success btn-sm" style="padding:6px 10px;">+</button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- 🏕️ Zelt-Prioritäten pro Slot -->
+<div class="card">
+    <h3>🏕️ Zelt-Prioritäten pro Slot</h3>
+    <p class="text-muted mb-2">
+        Welche Zelte haben Vorrang beim Auto-Assignment? 
+        <strong>1 = höchste Priorität</strong>, danach entscheidet der Anmeldezeitpunkt.
+    </p>
+    <div style="display:flex; flex-wrap:wrap; gap:16px;">
+        {% for slot in slots %}
+        <div style="flex:1; min-width:220px; background:#f8f9fa; border-radius:8px; padding:16px;">
+            <strong>{{ slot.name }}</strong>
+            <div style="margin:8px 0;">
+                {% if slot_priorities[slot.id] %}
+                    {% for p in slot_priorities[slot.id] %}
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px solid #eee;">
+                        <span><span class="badge badge-info">{{ p.zelt_name }}</span> → Rang {{ p.priority }}</span>
+                        <form class="inline-form" method="POST" action="{{ url_for('admin_priority_entfernen', slot_id=slot.id, zelt_name=p.zelt_name) }}">
+                            <input type="hidden" name="code" value="{{ code }}">
+                            <button type="submit" style="background:none;border:none;cursor:pointer;color:#dc3545;">×</button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <span class="text-muted">— keine Prioritäten gesetzt —</span>
+                {% endif %}
+            </div>
+            <form method="POST" action="{{ url_for('admin_priority_setzen') }}" style="display:flex; gap:4px; flex-wrap:wrap; margin-top:8px;">
+                <input type="hidden" name="code" value="{{ code }}">
+                <input type="hidden" name="slot_id" value="{{ slot.id }}">
+                <select name="zelt_name" required style="flex:1; min-width:80px; padding:6px; font-size:0.85rem; border:1px solid #ddd; border-radius:4px;">
+                    <option value="">Zelt</option>
+                    {% for z in zelte %}
+                        {% if z not in (slot_priorities[slot.id]|map(attribute='zelt_name')|list) %}
+                            <option value="{{ z }}">{{ z }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+                <select name="priority" required style="width:70px; padding:6px; font-size:0.85rem; border:1px solid #ddd; border-radius:4px;">
+                    <option value="1">Rang 1</option>
+                    <option value="2">Rang 2</option>
+                    <option value="3">Rang 3</option>
+                    <option value="4">Rang 4</option>
+                    <option value="5">Rang 5</option>
+                </select>
+                <button type="submit" class="btn btn-primary btn-sm">+</button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- 👥 Teilnehmer -->
+<div class="card">
+    <h3>👥 Teilnehmer ({{ teilnehmer|length }})</h3>
+    <p class="text-muted">
+        <a href="{{ url_for('admin_teilnehmer') }}" class="btn btn-primary">👥 Alle Teilnehmer anzeigen & verwalten</a>
+    </p>
+</div>
+
+
+
+<!-- 👻 Nicht angemeldete Teilnehmer -->
+<div class="card">
+    <h3>👻 Nicht angemeldet (pro Slot)</h3>
+    <p class="text-muted mb-2">Teilnehmer die für einen Slot noch keine Anmeldung haben.</p>
+    <div style="display:flex; flex-wrap:wrap; gap:16px;">
+        {% for slot in slots %}
+        <div style="flex:1; min-width:220px; background:#f8f9fa; border-radius:8px; padding:12px;">
+            <strong>{{ slot.name }}</strong>
+            {% set fehlende = nicht_angemeldet[slot.id] %}
+            {% if fehlende %}
+            <div style="margin-top:8px; font-size:0.8rem; max-height:200px; overflow-y:auto;">
+                {% for tn in fehlende %}
+                <div style="padding:3px 0; border-bottom:1px solid #eee;">
+                    {% if tn.verletzt %}<span class="badge badge-danger" style="font-size:0.65rem;">🩹</span>{% endif %}
+                    <strong>{{ tn.nachname }}</strong> {{ tn.vorname }}
+                    <span class="text-muted">({{ tn.zelt }})</span>
+                </div>
+                {% endfor %}
+            </div>
+            <div style="margin-top:8px; font-size:0.75rem; color:#666;">
+                {{ fehlende|length }} fehlen von {{ teilnehmer|length }} total
+            </div>
+            {% else %}
+            <p class="text-muted" style="margin-top:8px;">✅ Alle angemeldet</p>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- 📅 Einteilung + Auto-Assign -->
+<div class="card">
+    <h3>📅 Einteilung & Auto-Assignment</h3>
+    <p class="text-muted mb-2">
+        <strong>Auto-Assignment</strong> = priorisiert nach <strong>Zelt-Rang</strong> (1=höchste),
+        dann nach Anmeldezeitpunkt. Jeder Teilnehmer wählt 1 Sportart pro Slot.
+    </p>
+
+    <div class="tabs">
+        {% for slot in slots %}
+            <a href="#slot-{{ slot.id }}" class="slot-tab {% if loop.first %}active{% endif %}"
+               onclick="showSlot({{ slot.id }}); return false;">
+                {{ slot.name }}
+            </a>
+        {% endfor %}
+    </div>
+
+    {% for slot in slots %}
+    <div id="content-slot-{{ slot.id }}" class="tab-content {% if loop.first %}active{% endif %}">
+        {% set slot_anm = anmeldungen|selectattr('slot_id', 'equalto', slot.id)|list %}
+
+        <div style="margin-bottom:16px; display:flex; gap:12px; flex-wrap:wrap;">
+            <a href="{{ url_for('admin_zuteilung', slot_id=slot.id) }}" class="btn btn-primary">📋 Zuteilung & Export</a>
+            <form method="POST" action="{{ url_for('admin_auto_assign', slot_id=slot.id) }}"
+                  onsubmit="return confirm('Bestehende Einteilung für {{ slot.name }} wird überschrieben. Fortfahren?')"
+                  style="display:inline;">
+                <input type="hidden" name="code" value="{{ code }}">
+                <button type="submit" class="btn btn-warning">🤖 Auto-Assignment starten</button>
+            </form>
+        </div>
+
+        <div style="margin-bottom:10px; display:flex; gap:6px; flex-wrap:wrap;">
+            <button onclick="filterEinteilung('{{ slot.id }}', 'reg')" class="btn btn-sm einteil-filter" id="ef-{{ slot.id }}-reg" style="background:var(--primary);color:white;">✅ Angemeldet</button>
+            <button onclick="filterEinteilung('{{ slot.id }}', 'all')" class="btn btn-sm einteil-filter" id="ef-{{ slot.id }}-all">📋 Alle</button>
+            <input type="text" placeholder="🔍 Suchen..."
+                   oninput="searchEinteilung('{{ slot.id }}', this.value)"
+                   style="padding:4px 10px;border:1px solid var(--gray-300);border-radius:var(--radius);font-size:0.85rem;margin-left:auto;">
+        </div>
+
+        <form method="POST" action="{{ url_for('admin_einteilen') }}">
+            <input type="hidden" name="code" value="{{ code }}">
+            <input type="hidden" name="slot_id" value="{{ slot.id }}">
+
+            <div style="overflow-x:auto;">
+                <table class="einteil-tabelle" id="et-{{ slot.id }}">
+                    <tr>
+                        <th>Zelt</th>
+                        <th>Name</th>
+                        <th>⭐ 1. Wahl</th>
+                        <th>⭐ 2. Wahl</th>
+                        <th>⭐ 3. Wahl</th>
+                        <th style="min-width:140px;">Zuteilung</th>
+                    </tr>
+                    {% for a in slot_anm %}
+                    {% set zugeteilt = einteilungen[slot.id].get(a.teilnehmer_id) %}
+                    <tr class="einteil-row einteil-reg {% if not zugeteilt %}highlight-missing{% else %}highlight-ok{% endif %}" data-einteil-slot="{{ slot.id }}">
+                        <td><span class="badge badge-info">{{ a.zelt }}</span></td>
+                        <td><strong>{{ a.nachname }}</strong> {{ a.vorname }}</td>
+                        <td><span class="badge badge-success">{{ a.wahl1_name }}</span></td>
+                        <td><span class="badge badge-info">{{ a.wahl2_name }}</span></td>
+                        <td><span class="badge badge-neutral">{{ a.wahl3_name }}</span></td>
+                        <td>
+                            <select name="tn_{{ a.teilnehmer_id }}" class="einteil-select">
+                                <option value="0">— nicht zugeteilt —</option>
+                                {% for sid, sname in slot_sportarten[slot.id].items() %}
+                                <option value="{{ sid }}"
+                                    {% if zugeteilt and zugeteilt.sportart_id == sid %}selected{% endif %}>
+                                    {{ sname }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% for tn in teilnehmer %}
+                    {% if tn.id not in angemeldete_ids_pro_slot[slot.id] %}
+                    {% set zugeteilt = einteilungen[slot.id].get(tn.id) %}
+                    <tr class="einteil-row einteil-unreg" data-einteil-slot="{{ slot.id }}" style="display:none;">
+                        <td><span class="badge badge-info">{{ tn.zelt }}</span></td>
+                        <td><strong>{{ tn.nachname }}</strong> {{ tn.vorname }}</td>
+                        <td><span class="text-muted">–</span></td>
+                        <td><span class="text-muted">–</span></td>
+                        <td><span class="text-muted">–</span></td>
+                        <td>
+                            <select name="tn_{{ tn.id }}" class="einteil-select">
+                                <option value="0" {% if not zugeteilt %}selected{% endif %}>— nicht zugeteilt —</option>
+                                {% for sid, sname in slot_sportarten[slot.id].items() %}
+                                <option value="{{ sid }}"
+                                    {% if zugeteilt and zugeteilt.sportart_id == sid %}selected{% endif %}>
+                                    {{ sname }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                </table>
+            </div>
+            <div style="margin-top: 16px; display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+                <button type="submit" class="btn btn-success">💾 Einteilung speichern</button>
+                <span class="text-muted">
+                    {% set v = einteilungen[slot.id]|length %}
+                    {% set g = slot_anm|length %}
+                    {{ v }} von {{ g }} zugeteilt
+                </span>
+            </div>
+        </form>
+    </div>
+    {% endfor %}
+</div>
+
+
+
+<!-- 📝 Alle Anmeldungen -->
+<div class="card">
+    <h3>📝 Alle Anmeldungen ({{ anmeldungen|length }})</h3>
+    {% if anmeldungen %}
+    <div style="overflow-x:auto;">
+        <table>
+            <tr>
+                <th>Slot</th>
+                <th>Zelt</th>
+                <th>Name</th>
+                <th>⭐ 1. Wahl</th>
+                <th>⭐ 2. Wahl</th>
+                <th>⭐ 3. Wahl</th>
+                <th>Angemeldet am</th>
+                <th>Aktion</th>
+            </tr>
+            {% for a in anmeldungen %}
+            <tr>
+                <td><span class="badge badge-info">{{ a.slot_name }}</span></td>
+                <td>{{ a.zelt }}</td>
+                <td><strong>{{ a.nachname }}</strong> {{ a.vorname }}</td>
+                <td><span class="badge badge-success">{{ a.wahl1_name }}</span></td>
+                <td><span class="badge badge-info">{{ a.wahl2_name }}</span></td>
+                <td><span class="badge badge-neutral">{{ a.wahl3_name }}</span></td>
+                <td>{{ a.erstellt_um[:16] }}</td>
+                <td>
+                    <form class="inline-form" method="POST" action="{{ url_for('anmeldung_loeschen', anmeldung_id=a.id) }}"
+                          onsubmit="return confirm('Anmeldung löschen?')">
+                        <input type="hidden" name="code" value="{{ code }}">
+                        <button type="submit" class="btn btn-danger btn-sm">🗑️</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    {% else %}
+    <p class="text-muted">Noch keine Anmeldungen.</p>
+    {% endif %}
+</div>
+
+<div style="margin: 20px 0; display:flex; gap:12px; flex-wrap:wrap;">
+    <a href="{{ url_for('admin_import') }}" class="btn btn-primary">📥 CSV-Import</a>
+    <a href="{{ url_for('admin_zusammenfassung') }}" class="btn btn-primary">📊 Zusammenfassung</a>
+    <a href="/" class="btn btn-outline">🔙 Startseite</a>
+</div>
+
+<script>
+function showSlot(id) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.slot-tab').forEach(el => el.classList.remove('active'));
+    document.getElementById('content-slot-' + id).classList.add('active');
+    document.querySelector('.slot-tab[href="#slot-' + id + '"]').classList.add('active');
+}
+
+// Einteilung Filter: Angemeldet / Alle
+function filterEinteilung(slotId, mode) {
+    var rows = document.querySelectorAll('#et-' + slotId + ' .einteil-row');
+    rows.forEach(function(r) {
+        if (mode === 'reg') {
+            r.style.display = r.classList.contains('einteil-reg') ? '' : 'none';
+        } else {
+            r.style.display = '';
+        }
+    });
+    // Button highlight
+    document.querySelectorAll('#et-' + slotId + ' .einteil-filter').forEach(function(b) {
+        b.style.background = ''; b.style.color = '';
+    });
+    var btn = document.getElementById('ef-' + slotId + '-' + mode);
+    if (btn) { btn.style.background = 'var(--primary)'; btn.style.color = 'white'; }
+}
+// Einteilung Suche
+function searchEinteilung(slotId, val) {
+    var q = val.toLowerCase();
+    document.querySelectorAll('#et-' + slotId + ' .einteil-row').forEach(function(r) {
+        if (r.style.display === 'none') return;
+        r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+}
+</script>
+
+{% endblock %}

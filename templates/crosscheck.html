@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block titel %}Cross-Check – Admin{% endblock %}
+{% block content %}
+
+<h2 style="margin: 20px 0;">📋 Cross-Check Ergebnis</h2>
+
+<div style="display:flex; gap:16px; flex-wrap:wrap; margin-bottom: 20px;">
+    <div class="card" style="flex:1; min-width:150px; text-align:center;">
+        <div style="font-size:1.8rem; font-weight:700; color:#667eea;">{{ total_erwartet }}</div>
+        <div class="text-muted">Erwartet (Liste)</div>
+    </div>
+    <div class="card" style="flex:1; min-width:150px; text-align:center;">
+        <div style="font-size:1.8rem; font-weight:700; color:#28a745;">{{ gefunden|length }}</div>
+        <div class="text-muted">Gefunden ✅</div>
+    </div>
+    <div class="card" style="flex:1; min-width:150px; text-align:center;">
+        <div style="font-size:1.8rem; font-weight:700; color:#dc3545;">{{ fehlen|length }}</div>
+        <div class="text-muted">Fehlen ❌</div>
+    </div>
+    <div class="card" style="flex:1; min-width:150px; text-align:center;">
+        <div style="font-size:1.8rem; font-weight:700; color:#e67e22;">{{ zusaetzlich|length }}</div>
+        <div class="text-muted">Zusätzlich registriert</div>
+    </div>
+</div>
+
+<div class="grid-2">
+    {% if gefunden %}
+    <div class="card">
+        <h3>✅ Angemeldet ({{ gefunden|length }})</h3>
+        <table>
+            <tr><th>Nachname</th><th>Vorname</th><th>Zelt</th></tr>
+            {% for n, v, z in gefunden %}
+            <tr><td>{{ n }}</td><td>{{ v }}</td><td>{{ z }}</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+    {% endif %}
+
+    {% if fehlen %}
+    <div class="card" style="border-left: 4px solid #dc3545;">
+        <h3>❌ Nicht angemeldet ({{ fehlen|length }})</h3>
+        <table>
+            <tr><th>Nachname</th><th>Vorname</th><th>Zelt</th></tr>
+            {% for n, v, z in fehlen %}
+            <tr><td>{{ n }}</td><td>{{ v }}</td><td>{{ z }}</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+    {% endif %}
+
+    {% if zusaetzlich %}
+    <div class="card" style="border-left: 4px solid #e67e22;">
+        <h3>⚠️ Zusätzlich registriert ({{ zusaetzlich|length }})</h3>
+        <table>
+            <tr><th>Nachname</th><th>Vorname</th><th>Zelt</th></tr>
+            {% for n, v, z in zusaetzlich %}
+            <tr><td>{{ n }}</td><td>{{ v }}</td><td>{{ z }}</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+    {% endif %}
+</div>
+
+<div style="margin: 20px 0;">
+    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-primary">🔙 Zum Dashboard</a>
+</div>
+
+{% endblock %}

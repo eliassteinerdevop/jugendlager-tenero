@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block titel %}CSV-Import{% endblock %}
+{% block content %}
+
+<div class="card" style="max-width: 700px; margin: 20px auto;">
+    <h2>📥 Teilnehmer CSV-Import</h2>
+    <p class="text-muted mb-2">
+        CSV mit Semikolon (;) oder Komma (,) getrennt.<br>
+        <strong>Spalten:</strong> Anrede, Vorname, Name, Geburtsdatum, Kommentar, Schwimmen, Medikamente, Zelt
+    </p>
+
+    <div style="background:#f8f9fa; border-radius:8px; padding:16px; margin-bottom:20px;">
+        <h4 style="margin-bottom:8px;">📋 Beispiel</h4>
+        <pre style="background:white; padding:12px; border-radius:6px; font-size:0.85rem; overflow-x:auto;">
+Anrede;Vorname;Name;Geburtsdatum;Kommentar;Schwimmen;Medikamente;Zelt
+Herr;Max;Muster;12.11.2007;keine;Ja;–;Löwen
+Frau;Anna;Beispiel;07.04.2008;Glutenunverträglichkeit;Nein;–;Adler</pre>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+        <label for="csv_file">Datei hochladen (.csv):</label>
+        <input type="file" id="csv_file" name="csv_file" accept=".csv,.txt">
+
+        <p style="text-align:center; color:var(--gray-500); margin:12px 0;">— oder —</p>
+
+        <label for="csv_text">CSV direkt einfügen:</label>
+        <textarea id="csv_text" name="csv_text" rows="8" placeholder="Anrede;Vorname;Name;Geburtsdatum;Kommentar;Schwimmen;Medikamente;Zelt"></textarea>
+
+        <button type="submit" class="btn btn-success">📥 Importieren</button>
+        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline">🔙 Dashboard</a>
+    </form>
+</div>
+
+{% endblock %}

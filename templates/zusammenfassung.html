@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block titel %}Zusammenfassung – Admin{% endblock %}
+{% block content %}
+
+<h2 style="margin: 20px 0;">📊 Zusammenfassung</h2>
+
+<div style="display:flex; gap:16px; flex-wrap:wrap; margin-bottom:20px;">
+    <div class="card" style="flex:1; min-width:150px; text-align:center;">
+        <div style="font-size:2.5rem; font-weight:700; color:#667eea;">{{ total_tn }}</div>
+        <div class="text-muted">Teilnehmer</div>
+    </div>
+    <div class="card" style="flex:1; min-width:150px; text-align:center;">
+        <div style="font-size:2.5rem; font-weight:700; color:#667eea;">{{ total_anm }}</div>
+        <div class="text-muted">Anmeldungen total</div>
+    </div>
+</div>
+
+<div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+    {% for ss in slot_stats %}
+    <div class="card">
+        <h3>{{ ss.slot.name }}</h3>
+        <div style="margin-bottom:8px;">
+            Anmeldungen: <strong>{{ ss.anmeldungen }}</strong> ·
+            Verteilt: <strong>{{ ss.verteilt }}</strong>
+            {% if ss.unverteilt > 0 %}
+                <span style="color:#dc3545;">· ⚠️ {{ ss.unverteilt }} nicht zugeteilt</span>
+            {% else %}
+                <span style="color:#28a745;">· ✅ Alle zugeteilt</span>
+            {% endif %}
+        </div>
+        <table>
+            <tr><th>Sportart</th><th>Teilnehmer</th></tr>
+            {% for s in ss.sport_stats %}
+            <tr>
+                <td>{{ s.name }}</td>
+                <td>{{ s.count }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    {% endfor %}
+</div>
+
+<div style="margin: 20px 0;">
+    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-primary">🔙 Zum Dashboard</a>
+</div>
+
+{% endblock %}

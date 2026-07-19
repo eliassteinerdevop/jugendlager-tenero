@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Jugendlager Tenero – Kurzanleitung</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #1e293b; line-height: 1.6; padding: 40px; max-width: 800px; margin: 0 auto; }
+h1 { font-size: 1.8rem; margin-bottom: 4px; }
+.subtitle { color: #64748b; font-size: 1rem; margin-bottom: 32px; border-bottom: 2px solid #e2e8f0; padding-bottom: 16px; }
+h2 { font-size: 1.3rem; margin: 28px 0 12px; color: #4f46e5; }
+h3 { font-size: 1rem; margin: 20px 0 8px; }
+table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.9rem; }
+th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+th { background: #f1f5f9; font-weight: 600; }
+code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 0.85rem; }
+.highlight { background: #eef2ff; border-left: 4px solid #4f46e5; padding: 12px 16px; margin: 16px 0; border-radius: 4px; }
+.schritt { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin: 12px 0; }
+.schritt strong { color: #4f46e5; }
+ol { padding-left: 20px; }
+li { margin: 6px 0; }
+@media print { body { padding: 20px; } .page-break { page-break-before: always; } }
+</style>
+</head>
+<body>
+
+<h1>Jugendlager Tenero – Wahlsportarten</h1>
+<p class="subtitle">Kurzanleitung für die Lagerleitung</p>
+
+<h2>1. Zugänge</h2>
+<table>
+<tr><th>Bereich</th><th>Link</th><th>Code</th></tr>
+<tr><td><strong>Admin</strong> (alle Funktionen)</td><td><code>tenero.chruezfalsch.ch/admin</code></td><td><code>tenero2025</code></td></tr>
+<tr><td><strong>Leiter</strong> (nur anschauen)</td><td><code>tenero.chruezfalsch.ch/leiter</code></td><td><code>lager2025</code></td></tr>
+<tr><td><strong>Anmeldung</strong> (für Teilnehmer)</td><td><code>tenero.chruezfalsch.ch/teilnehmer/neu</code></td><td>–</td></tr>
+</table>
+
+<h2>2. Ablauf</h2>
+
+<div class="schritt">
+<strong>Schritt 1:</strong> Sportarten einrichten<br>
+Im Admin-Dashboard unter «Neue Sportart» alle Sportarten anlegen und pro Tag zuweisen.
+</div>
+
+<div class="schritt">
+<strong>Schritt 2:</strong> Teilnehmer anmelden<br>
+Jeder Teilnehmer legt einmal sein Konto an (Name + Zelt) und meldet sich dann pro Nachmittag separat mit 1./2./3. Wahl an.
+</div>
+
+<div class="schritt">
+<strong>Schritt 3:</strong> Slots freischalten<br>
+Nur freigeschaltete Slots werden bei der Anmeldung angezeigt. Erst Dienstag freischalten, alle melden sich an, dann Mittwoch, usw.
+</div>
+
+<div class="schritt">
+<strong>Schritt 4:</strong> Einteilung<br>
+Pro Slot per «Auto-Assignment» automatisch verteilen (nach Zelt-Priorität + Anmeldezeitpunkt) oder manuell anpassen.
+</div>
+
+<h2>3. Admin-Funktionen</h2>
+<table>
+<tr><th>Funktion</th><th>Beschreibung</th></tr>
+<tr><td>Slots verwalten</td><td>Slots nach und nach freischalten</td></tr>
+<tr><td>Sportarten pro Slot</td><td>Festlegen, was an welchem Tag angeboten wird</td></tr>
+<tr><td>Zelt-Prioritäten</td><td>Pro Tag festlegen, welches Zelt Vorrang hat</td></tr>
+<tr><td>Auto-Assignment</td><td>Verteilt Plätze automatisch nach Priorität + Zeit</td></tr>
+<tr><td>Zuteilung & Export</td><td>Konflikte anzeigen + CSV-Export pro Sportart</td></tr>
+<tr><td>Cross-Check</td><td>Liste hochladen und prüfen, wer fehlt</td></tr>
+</table>
+
+<h2>4. Export pro Sportart</h2>
+<p>Im Admin auf «Zuteilung & Export» → «CSV exportieren». Die CSV ist nach Sportarten gruppiert – ideal zum Ausdrucken für die Betreuer.</p>
+
+<h2>5. Datensicherung</h2>
+<p>Nach jeder Anmeldung wird automatisch ein Backup erstellt. Maximal 50 Backups, älteste werden gelöscht.</p>
+
+<h2>6. Hinweise</h2>
+<ul>
+<li>Die App ist für den internen Gebrauch im Lager-Netzwerk</li>
+<li>Admin-Code und Leiter-Code können bei Bedarf geändert werden</li>
+<li>Keine sensiblen Personen-Daten erfassen</li>
+</ul>
+
+</body>
+</html>
