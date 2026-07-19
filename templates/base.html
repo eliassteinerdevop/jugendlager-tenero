@@ -271,8 +271,12 @@
                 <a href="/anmelden">Anmelden</a>
                 {% if is_admin_logged_in or is_leiter_logged_in %}
                 <a href="/leiter">Leiter</a>
+                {% if is_admin_logged_in %}
                 <a href="/admin">Admin</a>
                 <a href="/admin/teilnehmer">👥 TN</a>
+                {% elif is_leiter_logged_in %}
+                <a href="/leiter">Leiter</a>
+                <a href="/admin">Admin</a>
                 {% endif %}
             </nav>
         </div>
