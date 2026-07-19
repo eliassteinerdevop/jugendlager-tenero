@@ -192,18 +192,20 @@
         <div style="flex:1; min-width:220px; background:#f8f9fa; border-radius:8px; padding:12px;">
             <strong>{{ slot.name }}</strong>
             {% set fehlende = nicht_angemeldet[slot.id] %}
+            {% set kranke = fehlende|selectattr('verletzt', 'equalto', 1)|list %}
+            {% set wirklich_fehlen = fehlende|selectattr('verletzt', 'equalto', 0)|list %}
             {% if fehlende %}
             <div style="margin-top:8px; font-size:0.8rem; max-height:200px; overflow-y:auto;">
                 {% for tn in fehlende %}
                 <div style="padding:3px 0; border-bottom:1px solid #eee;">
-                    {% if tn.verletzt %}<span class="badge badge-danger" style="font-size:0.65rem;">🩹</span>{% endif %}
+                    {% if tn.verletzt %}<span class="badge badge-danger" style="font-size:0.65rem;">🩹 Krank</span>{% endif %}
                     <strong>{{ tn.nachname }}</strong> {{ tn.vorname }}
                     <span class="text-muted">({{ tn.zelt }})</span>
                 </div>
                 {% endfor %}
             </div>
             <div style="margin-top:8px; font-size:0.75rem; color:#666;">
-                {{ fehlende|length }} fehlen von {{ teilnehmer|length }} total
+                {{ wirklich_fehlen|length }} fehlen{% if kranke %}, {{ kranke|length }} krank{% endif %} von {{ teilnehmer|length }} total
             </div>
             {% else %}
             <p class="text-muted" style="margin-top:8px;">✅ Alle angemeldet</p>
