@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block titel %}Teilnehmer bearbeiten – Admin{% endblock %}
+{% block content %}
+
+<div class="card" style="max-width: 600px; margin: 20px auto;">
+    <h2>✏️ {{ tn.vorname }} {{ tn.nachname }} bearbeiten</h2>
+
+    <form method="POST">
+        <div class="grid-2">
+            <div>
+                <label for="anrede">Anrede</label>
+                <input type="text" id="anrede" name="anrede" value="{{ tn.anrede or '' }}" placeholder="z.B. Herr, Frau">
+            </div>
+            <div>
+                <label for="vorname">Vorname *</label>
+                <input type="text" id="vorname" name="vorname" required value="{{ tn.vorname }}" placeholder="Vorname">
+            </div>
+        </div>
+        <div class="grid-2">
+            <div>
+                <label for="nachname">Nachname *</label>
+                <input type="text" id="nachname" name="nachname" required value="{{ tn.nachname }}" placeholder="Nachname">
+            </div>
+            <div>
+                <label for="geburtsdatum">Geburtsdatum</label>
+                <input type="text" id="geburtsdatum" name="geburtsdatum" value="{{ tn.geburtsdatum or '' }}" placeholder="z.B. 12.11.2007">
+            </div>
+        </div>
+        <label for="zelt">Zelt *</label>
+        <input type="text" id="zelt" name="zelt" required value="{{ tn.zelt }}" placeholder="Zelt">
+
+        <label for="hauptsportart">Hauptsportart</label>
+        <select id="hauptsportart" name="hauptsportart" style="width:100%; padding:8px 12px; border:1px solid var(--gray-300); border-radius:var(--radius); font-size:0.9rem; margin-bottom:14px;">
+            <option value="">— Keine —</option>
+            {% for hs in ["Akrobatik/Partnerakrobatik", "Ballsport", "Beachvolleyball", "Kampfsport", "Leichtathletik", "Parkour & co", "Schwimmsport", "Tennis und mehr", "Volleyball", "Wassersport"] %}
+            <option value="{{ hs }}" {% if tn.hauptsportart and hs in tn.hauptsportart %}selected{% endif %}>{{ hs }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="kommentar">Kommentar</label>
+        <input type="text" id="kommentar" name="kommentar" value="{{ tn.kommentar or '' }}" placeholder="Allergien, Besonderheiten, ...">
+
+        <div class="grid-2">
+            <div>
+                <label for="schwimmen">Schwimmen</label>
+                <select id="schwimmen" name="schwimmen" style="width:100%; padding:8px 12px; border:1px solid var(--gray-300); border-radius:var(--radius); font-size:0.9rem; margin-bottom:14px;">
+                    <option value="">—</option>
+                    <option value="Ja" {% if tn.schwimmen == 'Ja' %}selected{% endif %}>Ja</option>
+                    <option value="Nein" {% if tn.schwimmen == 'Nein' %}selected{% endif %}>Nein</option>
+                    <option value="mit Begleitung" {% if tn.schwimmen == 'mit Begleitung' %}selected{% endif %}>mit Begleitung</option>
+                </select>
+            </div>
+            <div>
+                <label for="medikamente">Medikamente</label>
+                <input type="text" id="medikamente" name="medikamente" value="{{ tn.medikamente or '' }}" placeholder="z.B. Cetirizin, Asthma-Spray">
+            </div>
+        </div>
+
+        <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top: 20px;">
+            <button type="submit" class="btn btn-success">💾 Speichern</button>
+            <a href="{{ url_for('admin_teilnehmer', code=code) }}" class="btn btn-outline">🔙 Abbrechen</a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

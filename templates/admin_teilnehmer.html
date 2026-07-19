@@ -47,6 +47,7 @@
                 </td>
                 <td>{{ anm_count }}/{{ slots|length }} Slots</td>
                 <td style="white-space:nowrap;">
+                    <a href="{{ url_for('teilnehmer_bearbeiten', tn_id=tn.id) }}" class="btn btn-sm" style="padding:2px 8px;font-size:0.7rem;">✏️</a>
                     <form class="inline-form" method="POST" action="{{ url_for('teilnehmer_verletzt_toggle', tn_id=tn.id) }}">
                         <input type="hidden" name="code" value="{{ code }}">
                         <button type="submit" class="btn btn-sm {% if tn.verletzt %}btn-success{% else %}btn-warning{% endif %}"

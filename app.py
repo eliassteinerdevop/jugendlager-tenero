@@ -962,6 +962,54 @@ def teilnehmer_loeschen(tn_id):
     flash("Teilnehmer gelöscht.", "info")
     return redirect(url_for("admin_dashboard", code=code))
 
+
+# ─── Admin: Teilnehmer bearbeiten ─────────────────────────────
+
+@app.route("/admin/teilnehmer/bearbeiten/<int:tn_id>", methods=["GET", "POST"])
+def teilnehmer_bearbeiten(tn_id):
+    code = check_admin()
+    if not code:
+        return redirect(url_for("admin_login"))
+
+    conn = get_db()
+    tn = conn.execute("SELECT * FROM teilnehmer WHERE id = ?", (tn_id,)).fetchone()
+    if not tn:
+        conn.close()
+        flash("Teilnehmer nicht gefunden.", "danger")
+        return redirect(url_for("admin_teilnehmer", code=code))
+
+    if request.method == "POST":
+        vorname = request.form.get("vorname", "").strip()
+        nachname = request.form.get("nachname", "").strip()
+        zelt = request.form.get("zelt", "").strip()
+        anrede = request.form.get("anrede", "").strip()
+        geburtsdatum = request.form.get("geburtsdatum", "").strip()
+        kommentar = request.form.get("kommentar", "").strip()
+        schwimmen = request.form.get("schwimmen", "").strip()
+        medikamente = request.form.get("medikamente", "").strip()
+        hauptsportart = request.form.get("hauptsportart", "").strip()
+
+        if not vorname or not nachname:
+            flash("Vorname und Nachname sind Pflicht.", "danger")
+            conn.close()
+            return render_template("admin_teilnehmer_bearbeiten.html", tn=tn, code=code)
+
+        try:
+            conn.execute(
+                "UPDATE teilnehmer SET vorname=?, nachname=?, zelt=?, anrede=?, geburtsdatum=?, kommentar=?, schwimmen=?, medikamente=?, hauptsportart=? WHERE id=?",
+                (vorname, nachname, zelt, anrede, geburtsdatum, kommentar, schwimmen, medikamente, hauptsportart, tn_id))
+            conn.commit()
+            flash(f"{vorname} {nachname} aktualisiert ✅", "success")
+            conn.close()
+            return redirect(url_for("admin_teilnehmer", code=code))
+        except Exception as e:
+            conn.close()
+            flash(f"Fehler: {e}", "danger")
+
+    conn.close()
+    return render_template("admin_teilnehmer_bearbeiten.html", tn=tn, code=code)
+
+
 # ─── Admin: Verletzt markieren ────────────────────────────────
 
 @app.route("/admin/teilnehmer/verletzt/<int:tn_id>", methods=["POST"])
