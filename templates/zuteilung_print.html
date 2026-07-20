@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Zuteilung {{ slot.name }} – Jugendsportcamp Aargau</title>
+<style>
+    @page {
+        size: {% if show_medical %}A4 landscape{% else %}A4{% endif %};
+        margin: 15mm;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        font-size: 10pt;
+        color: #222;
+        line-height: 1.4;
+    }
+    h1 { font-size: 16pt; margin-bottom: 4px; }
+    .subtitle { color: #666; font-size: 10pt; margin-bottom: 16px; }
+    h2 {
+        font-size: 13pt;
+        color: #cc0000;
+        margin: 20px 0 8px;
+        padding-bottom: 4px;
+        border-bottom: 2px solid #cc0000;
+    }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: 9pt; }
+    th {
+        text-align: left;
+        padding: 5px 6px;
+        font-weight: 600;
+        font-size: 8pt;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 2px solid #ccc;
+        white-space: nowrap;
+    }
+    td { padding: 4px 6px; border-bottom: 1px solid #eee; }
+    .zelt { white-space: nowrap; font-weight: 600; }
+    .info { font-size: 8pt; color: #666; }
+    .print-only { display: block; }
+    .no-print { display: none; }
+    @media print {
+        .no-print { display: none; }
+        body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+        h2 { break-before: page; }
+        h2:first-of-type { break-before: auto; }
+    }
+    .btn-print {
+        display: inline-block;
+        padding: 8px 20px;
+        background: #cc0000;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        font-size: 10pt;
+        margin-bottom: 16px;
+        cursor: pointer;
+    }
+</style>
+</head>
+<body>
+
+<div class="no-print">
+    <button onclick="window.print()" class="btn-print">🖨️ Drucken / PDF</button>
+    <a href="javascript:history.back()" style="margin-left:10px;">🔙 Zurück</a>
+</div>
+
+<h1>Jugendsportcamp Aargau</h1>
+<p class="subtitle">Zuteilung – {{ slot.name }}</p>
+
+{% set aktuelle_sport = namespace(name='') %}
+{% for r in rows %}
+    {% if r.sportart != aktuelle_sport.name %}
+        {% set aktuelle_sport.name = r.sportart %}
+        <h2>{{ r.sportart }}</h2>
+        {% if r.treffpunkt_zeit or r.treffpunkt_ort or r.material or r.leitung %}
+        <p class="info">
+            {% if r.treffpunkt_zeit %}🕐 {{ r.treffpunkt_zeit }}{% endif %}
+            {% if r.treffpunkt_ort %} 📍 {{ r.treffpunkt_ort }}{% endif %}
+            {% if r.material %} 🎒 {{ r.material }}{% endif %}
+            {% if r.leitung %} 👤 {{ r.leitung }}{% endif %}
+        </p>
+        {% endif %}
+        <table>
+            <tr>
+                <th>Zelt</th>
+                <th>Name</th>
+                {% if show_medical %}
+                <th>🏅 Hauptsportart</th>
+                <th>🏊 Schwimmen</th>
+                <th>💊 Medikamente</th>
+                <th>💬 Kommentar</th>
+                {% endif %}
+            </tr>
+    {% endif %}
+    <tr>
+        <td class="zelt">{{ r.zelt }}</td>
+        <td><strong>{{ r.nachname }}</strong> {{ r.vorname }}</td>
+        {% if show_medical %}
+        <td class="info">{{ r.hauptsportart.split('(')[0].strip() if r.hauptsportart else '–' }}</td>
+        <td>{{ r.schwimmen or '–' }}</td>
+        <td>{{ r.medikamente or '–' }}</td>
+        <td>{{ r.kommentar or '–' }}</td>
+        {% endif %}
+    </tr>
+{% endfor %}
+</table>
+
+<p class="info" style="margin-top:20px;">Erstellt: {{ generated_at }}</p>
+
+<script>
+window.onload = function() { /* bereit */ };
+</script>
+</body>
+</html>

@@ -441,9 +441,11 @@ def anmeldung_loeschen(anmeldung_id):
     if a:
         _log_anmeldung(anmeldung_id, a["teilnehmer_id"], a["slot_id"], "delete", a["wahl1_id"], a["wahl2_id"], a["wahl3_id"])
     conn.execute("DELETE FROM anmeldungen WHERE id = ?", (anmeldung_id,))
+    conn.execute("DELETE FROM einteilungen WHERE teilnehmer_id = ? AND slot_id = ?",
+                 (a["teilnehmer_id"], a["slot_id"]))
     conn.commit()
     conn.close()
-    flash("Anmeldung gelöscht.", "info")
+    flash("Anmeldung + Zuteilung gelöscht.", "info")
     if code == ADMIN_CODE:
         return redirect(url_for("admin_dashboard", code=code))
     return redirect(url_for("index"))
@@ -1297,6 +1299,72 @@ def admin_export(slot_id):
         mimetype="text/csv",
         headers={"Content-disposition": f"attachment; filename={slot['name']}_einteilung.csv"}
     )
+
+# ─── Admin: Zuteilung drucken (PDF-Ansicht) ────────────────────
+
+@app.route("/admin/zuteilung/<int:slot_id>/print")
+def admin_zuteilung_print(slot_id):
+    """Druckansicht für Admin – ohne Medi/Schwimmen/Kommentar"""
+    code = check_admin()
+    if not code:
+        return redirect(url_for("admin_login"))
+
+    conn = get_db()
+    slot = conn.execute("SELECT * FROM slots WHERE id = ?", (slot_id,)).fetchone()
+    if not slot:
+        conn.close()
+        flash("Slot nicht gefunden.", "danger")
+        return redirect(url_for("admin_dashboard", code=code))
+
+    rows = conn.execute("""
+        SELECT s.name as sportart, s.treffpunkt_zeit, s.treffpunkt_ort, s.material, s.leitung,
+               t.zelt, t.nachname, t.vorname
+        FROM einteilungen e
+        JOIN teilnehmer t ON t.id = e.teilnehmer_id
+        JOIN sportarten s ON s.id = e.sportart_id
+        LEFT JOIN anmeldungen a ON a.teilnehmer_id = t.id AND a.slot_id = e.slot_id
+        WHERE e.slot_id = ?
+        ORDER BY s.name, t.zelt, t.nachname
+    """, (slot_id,)).fetchall()
+
+    conn.close()
+    from datetime import datetime
+    return render_template("zuteilung_print.html", slot=slot, rows=rows, show_medical=False,
+                         generated_at=datetime.now().strftime('%d.%m.%Y %H:%M'))
+
+
+# ─── Leiter: Zuteilung drucken (PDF-Ansicht mit Medi) ──────────
+
+@app.route("/leiter/zuteilung/<int:slot_id>/print")
+def leiter_zuteilung_print(slot_id):
+    """Druckansicht für Leiter – MIT Medi/Schwimmen/Kommentar/Hauptsportart"""
+    code = check_leiter()
+    if not code:
+        return redirect(url_for("leiter_login"))
+
+    conn = get_db()
+    slot = conn.execute("SELECT * FROM slots WHERE id = ?", (slot_id,)).fetchone()
+    if not slot:
+        conn.close()
+        flash("Slot nicht gefunden.", "danger")
+        return redirect(url_for("leiter_uebersicht"))
+
+    rows = conn.execute("""
+        SELECT s.name as sportart, s.treffpunkt_zeit, s.treffpunkt_ort, s.material, s.leitung,
+               t.zelt, t.nachname, t.vorname, t.schwimmen, t.medikamente, t.kommentar, t.hauptsportart
+        FROM einteilungen e
+        JOIN teilnehmer t ON t.id = e.teilnehmer_id
+        JOIN sportarten s ON s.id = e.sportart_id
+        LEFT JOIN anmeldungen a ON a.teilnehmer_id = t.id AND a.slot_id = e.slot_id
+        WHERE e.slot_id = ?
+        ORDER BY s.name, t.zelt, t.nachname
+    """, (slot_id,)).fetchall()
+
+    conn.close()
+    from datetime import datetime
+    return render_template("zuteilung_print.html", slot=slot, rows=rows, show_medical=True,
+                         generated_at=datetime.now().strftime('%d.%m.%Y %H:%M'))
+
 
 # ─── Admin: Zusammenfassung ────────────────────────────────────
 

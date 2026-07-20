@@ -14,6 +14,7 @@
       <span class="badge {% if sport_detail.anzahl >= sport_info.max_teilnehmer %}badge-success{% elif sport_detail.anzahl > 0 %}badge-warning{% else %}badge-neutral{% endif %}" style="font-size:0.9rem;">
         {{ sport_detail.anzahl }}/{{ sport_info.max_teilnehmer }} Teilnehmer
       </span>
+      <a href="{{ url_for('leiter_zuteilung_print', slot_id=slot_info.id) }}" class="btn btn-sm btn-primary" target="_blank">🖨️ Drucken</a>
       <a href="{{ url_for('sportart_export', sportart_id=sport_info.id, slot_id=slot_info.id) }}" class="btn btn-sm btn-outline">📥 CSV</a>
     </div>
   </div>

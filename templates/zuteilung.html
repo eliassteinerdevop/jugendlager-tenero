@@ -122,8 +122,8 @@
 
 <!-- Aktionen -->
 <div style="margin: 20px 0; display:flex; gap:12px; flex-wrap:wrap;">
+    <a href="{{ url_for('admin_zuteilung_print', slot_id=slot.id) }}" class="btn btn-primary" target="_blank">🖨️ Drucken (für TN)</a>
     <a href="{{ url_for('admin_export', slot_id=slot.id) }}" class="btn btn-success">📥 CSV exportieren</a>
-    <button onclick="window.print()" class="btn btn-primary">🖨️ Drucken</button>
     <a href="{{ url_for('admin_dashboard') }}#slot-{{ slot.id }}" class="btn btn-outline">🔙 Zur Einteilung</a>
 </div>
 
